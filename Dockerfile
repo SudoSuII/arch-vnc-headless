@@ -6,7 +6,8 @@ RUN pacman -Sy --noconfirm \
     tigervnc xorg \
     wget bc sudo \
     xfce4 \
-    vim
+    vim \
+    python
 
 # Set the version and download dumb-init (use the correct architecture)
 ENV DUMB_INIT_VERSION "1.2.5"
@@ -40,8 +41,9 @@ USER docker
 
 # Set volumes and expose necessary ports
 VOLUME /root/.vnc
-
-EXPOSE 5901
+COPY launch.py /root/launch.py
+RUN python3 /root/launch.py
+EXPOSE 5900
 EXPOSE 5801
 
 # Use dumb-init as the entry point
