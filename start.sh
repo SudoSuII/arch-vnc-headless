@@ -59,7 +59,7 @@ function _start_vnc {
 
     _process_xrandr_env &
 
-    vncserver :0 -localhost no -geometry 1024x768 -depth 24
+    vncserver :0 
 }
 
 _start_vnc
