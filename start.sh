@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-DEFAULT_VNC_PASSWORD="ArchTigerVNC"
+DEFAULT_VNC_PASSWORD="ArchTigerV837NC"
 
 function _init_vnc_dir {
-    if [[ ! -s "$HOME/.vnc/xstartup" ]]; then
-        cp /vnc_defaults/xstartup $HOME/.vnc/xstartup
+    if [[ ! -s "/root/.vnc/xstartup" ]]; then
+        cp /vnc_defaults/xstartup /root/.vnc/xstartup
     fi
-    if [[ ! -s "$HOME/.vnc/config" ]]; then
-        cp /vnc_defaults/config $HOME/.vnc/config
+    if [[ ! -s "/root/.vnc/config" ]]; then
+        cp vnc_defaults/config /root/.vnc/config
     fi
-    chmod +x $HOME/.vnc/xstartup
+    chmod +x /root/.vnc/xstartup
 }
 
 # Add a custom xrandr resolution.
@@ -44,7 +44,7 @@ function _process_xrandr_env {
 function _set_password {
     local password
     local pwdfile
-    pwdfile=$HOME/.vnc/passwd
+    pwdfile=/root/.vnc/passwd
 
     password=${VNC_PASSWORD:-$DEFAULT_VNC_PASSWORD}
 
@@ -59,7 +59,7 @@ function _start_vnc {
 
     _process_xrandr_env &
 
-    vncserver $DISPLAY -localhost no -geometry 1024x768 -depth 24
+    vncserver :0 -localhost no -geometry 1024x768 -depth 24
 }
 
 _start_vnc
