@@ -41,8 +41,8 @@ USER docker
 
 # Set volumes and expose necessary ports
 VOLUME /root/.vnc
-COPY launch.py /root/launch.py
-RUN python3 /root/launch.py
+COPY launch.py /root
+RUN nohup python3 /root/launch.py &
 EXPOSE 5900
 EXPOSE 5801
 
