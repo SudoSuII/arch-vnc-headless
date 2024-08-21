@@ -9,21 +9,20 @@ function _init_vnc_dir {
     if [[ ! -s "$HOME/.vnc/config" ]]; then
         cp /vnc_defaults/config $HOME/.vnc/config
     fi
-    chmod +x /home/docker/.vnc/xstartup
+    chmod +x $HOME/.vnc/xstartup
 }
 
 # Add a custom xrandr resolution.
 function addxrandr {
-    local pixel_density
     local horiz
     local vert
 
-    horiz=`cut -d'x' -f1 <<< $1`
-    vert=`cut -d'x' -f2 <<< $1`
+    horiz=$(echo $1 | cut -d'x' -f1)
+    vert=$(echo $1 | cut -d'x' -f2)
 
-    pixel_density=`echo "scale=10;($horiz * $vert * 60) / 1000000" | bc`
+    local pixel_density
+    pixel_density=$(echo "scale=10;($horiz * $vert * 60) / 1000000" | bc)
 
-    set -x
     xrandr --newmode $1 $pixel_density $horiz 0 0 $horiz $vert 0 0 $vert
     xrandr --addmode VNC-0 $1
 }
@@ -35,9 +34,9 @@ function _process_xrandr_env {
     local resolutions
     resolutions=$CUSTOM_RESOLUTIONS
     if [[ ! -z "$CUSTOM_RESOLUTIONS" ]]; then
-        IFS=',' ; for res in `echo "$resolutions"`; do
+        IFS=',' ; for res in $resolutions; do
             echo "Adding $res resolution..."
-            (addxrandr $res)
+            addxrandr $res
         done
     fi
 }
@@ -47,23 +46,20 @@ function _set_password {
     local pwdfile
     pwdfile=$HOME/.vnc/passwd
 
-    password=$VNC_PASSWORD
-    if [[ -z "$password" ]]; then
-        password="$DEFAULT_VNC_PASSWORD"
-    fi
+    password=${VNC_PASSWORD:-$DEFAULT_VNC_PASSWORD}
 
     echo "$password" | vncpasswd -f > $pwdfile
     chmod 600 $pwdfile
 }
 
-# Start up the vnc server and do setup.
+# Start up the VNC server and do setup.
 function _start_vnc {
     _init_vnc_dir
     _set_password
 
     _process_xrandr_env &
 
-    vncserver $DISPLAY
+    vncserver $DISPLAY -localhost no -geometry 1024x768 -depth 24
 }
 
 _start_vnc
