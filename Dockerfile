@@ -1,47 +1,51 @@
 FROM archlinux:latest
 
-RUN pacman -Sy --noconfirm 
-RUN pacman -S --noconfirm \
+# Update and install necessary packages
+RUN pacman -Sy --noconfirm \
+    && pacman -S --noconfirm \
     tigervnc xorg \
     wget bc sudo \
     xfce4 \
     vim
 
+# Set the version and download dumb-init (use the correct architecture)
 ENV DUMB_INIT_VERSION "1.2.5"
 
 RUN wget -O /usr/local/bin/dumb-init \
-"https://github.com/Yelp/dumb-init/releases/download/v${DUMB_INIT_VERSION}"\
-"/dumb-init_${DUMB_INIT_VERSION}_aarch64"
+"https://github.com/Yelp/dumb-init/releases/download/v${DUMB_INIT_VERSION}/dumb-init_${DUMB_INIT_VERSION}_x86_64" \
+    && chmod +x /usr/local/bin/dumb-init
 
-RUN chmod +x /usr/local/bin/dumb-init
-
+# Add a user 'docker' with a home directory and sudo access
 RUN useradd -m -G wheel --create-home \
 -p "$(openssl passwd -1 changeme)" docker
 
-RUN mkdir -p /home/docker
+# Create necessary directories and set correct permissions
+RUN mkdir -p /home/docker/.vnc \
+    && chown -R docker:docker /home/docker
 
-RUN mkdir -p /home/docker/.vnc
-
-RUN chown -R docker /home/docker
-
+# Copy configuration files
 COPY ./sudoers-config /etc/sudoers.d/
-
 COPY ./vnc-config/ /vnc_defaults/
-
 COPY ./start.sh /entrypoint
 
+# Set permissions for the entrypoint script
 RUN chmod +x /entrypoint
 
+# Set environment variables
 ENV DISPLAY :1
 ENV EDITOR vim
 
+# Switch to non-root user
 USER docker
 
+# Set volumes and expose necessary ports
 VOLUME /home/docker/.vnc
 
 EXPOSE 5901
 EXPOSE 5801
 
+# Use dumb-init as the entry point
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 
+# Start the VNC server
 CMD ["/entrypoint"]
