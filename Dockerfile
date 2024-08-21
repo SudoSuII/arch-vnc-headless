@@ -1,8 +1,7 @@
-ARG ARCH_VERSION=base-20220731.0.71623
+FROM archlinux:latest
 
-FROM archlinux:$ARCH_VERSION
-
-RUN pacman -Sy --noconfirm && pacman -S --noconfirm \
+RUN pacman -Sy --noconfirm 
+RUN pacman -S --noconfirm \
     tigervnc xorg \
     wget bc sudo \
     xfce4 \
