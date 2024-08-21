@@ -20,8 +20,8 @@ RUN useradd -m -G wheel --create-home \
 -p "$(openssl passwd -1 changeme)" docker
 
 # Create necessary directories and set correct permissions
-RUN mkdir -p /home/docker/.vnc \
-    && chown -R docker:docker /home/docker
+RUN mkdir -p /root/.vnc \
+    && chown -R docker:docker /root
 
 # Copy configuration files
 COPY ./sudoers-config /etc/sudoers.d/
@@ -39,7 +39,7 @@ ENV EDITOR vim
 USER docker
 
 # Set volumes and expose necessary ports
-VOLUME /home/docker/.vnc
+VOLUME /root/.vnc
 
 EXPOSE 5901
 EXPOSE 5801
